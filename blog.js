@@ -1,22 +1,21 @@
-
-require ('dotenv').config();
-const express = require('express');
+require("dotenv").config();
+const express = require("express");
 const blog = express();
 const port = process.env.HOST_PORT;
-const domain =process.env.HOST_DOMAIN;
+const domain = process.env.HOST_DOMAIN;
+const connection = require("./configurazione.js");
+const errorsHandler = require("./middlewares/errorsHandler.js");
+const notFound = require("./middlewares/notFound.js");
 
-const errorsHandler =require('./middlewares/errorsHandler.js');
-const notFound = require('./middlewares/notFound.js');
-
-blog.use (express.json());
-blog.use(express.static ('public'));
+blog.use(express.json());
+blog.use(express.static("public"));
 
 const postsRouter = require("./routers/posts.js");
-blog.use('/posts',postsRouter);
+blog.use("/posts", postsRouter);
 
-blog.use(errorsHandler) ;
+blog.use(errorsHandler);
 
+connection.connect();
 blog.listen(port, () => {
   console.log(`server in ascolto sulla porta ${domain}:${port}`);
 });
-
