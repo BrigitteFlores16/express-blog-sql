@@ -16,19 +16,38 @@ function index(req, res) {
 //# show
 function show(req, res) {
   const id = parseInt(req.params.id);
-  const sql = "SELECT * FROM `posts` WHERE `id` = ?";
+  const sqlPost = `
+    SELECT posts.*, tags.label
+    FROM posts
+    INNER JOIN post_tag ON post_tag.post_id = posts.id
+    INNER JOIN tags ON post_tag.tag_id = tags.id
+    WHERE posts.id = ?;
+  `;
 
-  connection.query(sql, [id], (err, results) => {
+  connection.query(sqlPost, [id], (err, postsResults) => {
     if (err) {
       console.log(err);
       return res.status(500).json({ error: "Database query failed" });
     }
 
-    if (results.length === 0) {
-      return res.status(404).json({ error: "Posts not found" });
+    if (postsResults.length === 0) {
+      return res.status(404).json({ error: "Post not found" });
     }
 
-    res.json(results[0]);
+    const post = {
+      id: postsResults[0].id,
+      title: postsResults[0].title,
+      content: postsResults[0].content,
+      labels: [],
+    };
+
+    postsResults.forEach((row) => {
+      post.labels.push(row.label);
+    });
+
+    post.labels = post.labels.join(", ");
+
+    res.json(post);
   });
 }
 
