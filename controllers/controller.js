@@ -91,23 +91,17 @@ function modify(req, res) {
 //# destroy
 function destroy(req, res) {
   const id = parseInt(req.params.id);
-
-  //const post = postsdata.find ((post)=> post.id === id);
-
-  //if (! post){
-  //  const err = new Error('posts not found');
-  // err.code= 404;
-  // throw err;
-  // }
-
-  //const postIndex = postsdata.indexOf (post);
-
-  //postsdata.splice(postIndex,1);
-
-  // console.log(postsdata);
-  //res.sendStatus(204)
-
-  //res.json (postsdata);
+  const sql = "DELETE FROM `Posts` WHERE `id` = ?";
+  connection.query(sql, [id], (err) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ error: "Database query failed" });
+    }
+    res.sendStatus(204);
+  });
 }
+
+const PostsArray = (posts) =>
+  posts.map((posts) => ({ ...posts, image: "/images/posts/" + posts.image }));
 
 module.exports = { index, show, store, update, modify, destroy };
